@@ -3,15 +3,15 @@
 #include <sstream>
 #include <cstdlib>
 
-#define INPUT_SIZE 16
-#define OUTPUT_SIZE 16
+#define INPUT_SIZE 16 //Input file has 16 values
+#define OUTPUT_SIZE 512 //Output file (from Teams) has 512 values
 
-// The weights array is 16x512, where each row contains the weights for a single neuron.
-#define WEIGHTS_ROW 16
-#define WEIGHTS_COL 16
+// !!! Still need to figure out how the weights work tbh, will sit down and have a better look
+// The weights array is 16x512, where each row contains the weights for a single neuron. 
+#define WEIGHTS_ROW 16 //Each row has 16 values (the actual file has 512 values per row)
+#define WEIGHTS_COL 512 //There are 16 rows
 
-class DenseLayer
-{
+class DenseLayer {
 public:
     // The constructor loads the weights from the CSV file.
     DenseLayer(const std::string &weights_file, const std::string &biases_file);
@@ -21,8 +21,8 @@ public:
 
 private:
     float input[INPUT_SIZE];
-    float weights[OUTPUT_SIZE][INPUT_SIZE];
-    float bias[OUTPUT_SIZE];   // You can load biases similarly if needed
+    float weights[INPUT_SIZE][OUTPUT_SIZE];
+    float bias[OUTPUT_SIZE];  
     float output[OUTPUT_SIZE];
 
     float ReLU(float x);
@@ -32,7 +32,6 @@ private:
 };
 
 // Load weights from CSV file into the weights array.
-// The file should have 16 rows and each row should contain 512 comma-separated values.
 void DenseLayer::loadWeights(const std::string &filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -41,7 +40,7 @@ void DenseLayer::loadWeights(const std::string &filename) {
     }
 
     std::string line;
-    for (int i = 0; i < WEIGHTS_COL; i++) {
+    for (int i = 0; i < 512; i++) {
         if (!std::getline(file, line)) {
             std::cerr << "Error: Not enough lines in weights file." << std::endl;
             exit(1);
@@ -61,12 +60,12 @@ void DenseLayer::loadWeights(const std::string &filename) {
                 exit(1);
             }
             j++;
-            if (j > WEIGHTS_ROW) {
+            if (j > WEIGHTS_COL) {
                 std::cerr << "Error: Too many values in row " << i << " of weights file." << std::endl;
                 exit(1);
             }
         }
-        if (j < WEIGHTS_ROW) {
+        if (j < WEIGHTS_COL) {
             std::cerr << "Error: Too few values in row " << i << " of weights file." << std::endl;
             exit(1);
         }
@@ -75,7 +74,6 @@ void DenseLayer::loadWeights(const std::string &filename) {
 }
 
 void DenseLayer::loadBiases(const std::string &filename) {
-    // Similar to loadWeights, but for biases
     
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -96,10 +94,7 @@ void DenseLayer::loadBiases(const std::string &filename) {
 // Constructor: loads the weights and initializes biases (defaulting to 0.1f) and outputs.
 DenseLayer::DenseLayer(const std::string &weights_file, const std::string &biases_file) {
     loadWeights(weights_file);
-    for (int i = 0; i < OUTPUT_SIZE; i++) {
-        bias[i] = 0.1f; // Default bias value
-        output[i] = 0.0f;
-    }
+    loadBiases(biases_file);
 }
 
 // Set input values from an external array.
@@ -139,10 +134,9 @@ void DenseLayer::printOutput() {
 }
 
 int main() {
-    // The CSV file "weights-sample.csv" should contain 16 rows, each with 512 comma-separated values.
-    DenseLayer layer("/Users/kateaizpuru/Documents/CNN/test-data/weights-altered.csv", "/Users/kateaizpuru/Documents/CNN/test-data/biases.csv");
+    // The CSV file should contain 16 rows, each with 512 values.
+    DenseLayer layer("/Users/kateaizpuru/Documents/CNN/test-data/weights.csv", "/Users/kateaizpuru/Documents/CNN/test-data/biases.csv");
 
-    // Prepare an example input: an array of 512 values.
     float example_input[INPUT_SIZE] = {0.023172325, 0.954666768, 0.537868863, 0.428133923, 0.874992976, 0.52329852, 0.499172047, 0.6028312, 
         0.095627101, 0.38898065, 0.799446854, 0.618940573, 0.078196824, 0.882892741, 0.844261063, 0.523200747};
 
