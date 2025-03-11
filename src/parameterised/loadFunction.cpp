@@ -39,7 +39,7 @@ float* loadFunction(const std::string &filename, int csvRows, int csvCols, bool 
             while (std::getline(ss, value, ',')) { // Loop through the values in the line with a comma delimiter
                 try {
                     data[i * csvCols + j] = std::stof(value); // Flatten the 2D array into 1D
-                    std::cout << "Data[" << i << "][" << j << "] = " << data[i * csvCols + j] << std::endl; // Debug print
+                    // std::cout << "Data[" << i << "][" << j << "] = " << data[i * csvCols + j] << std::endl; // Debug print
                 } catch (const std::invalid_argument &e) {
                     std::cerr << "Error: Invalid number at row " << i << ", column " << j << std::endl;
                     exit(1);

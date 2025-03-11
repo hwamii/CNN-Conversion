@@ -1,40 +1,30 @@
 #include <iostream>
 #include "loadFunction.h"
 
+#include <iomanip>
+
 // Constants for array sizes
-#define weightCols 512
-#define weightRows 16
-#define biasRows 512
-#define biasCols 1
-#define expectedData 16
-#define neurons 512
+#define WEIGHT_COLS 512
+#define WEIGHT_ROWS 16
+#define BIAS_ROWS 512
+#define BIAS_COLS 1
+#define EXPECTED_DATA 16
+#define NEURON_NUM 512
 
 class DenseLayer {
 public:
     DenseLayer();
-    void setInput(const float new_input[expectedData]);
-    void forward(const float* weights1D, const float bias[biasRows], int expected_inputs, int expected_outputs);
-    void printOutput();
+    void forward(float d_in[EXPECTED_DATA], float* weights1D, float bias[BIAS_ROWS], float d_out[NEURON_NUM]);
+    void printOutput(const float d_out[NEURON_NUM]);
 
 private:
     float dotProduct(const float a[], const float b[], int size);
-    float input[expectedData];
-    float output[neurons];
     float ReLU(float x);
 };
 
 // Constructor
 DenseLayer::DenseLayer() {
-    for (int i = 0; i < neurons; i++) {
-        output[i] = 0.0f;
-    }
-}
-
-// Set input values
-void DenseLayer::setInput(const float new_input[expectedData]) {
-    for (int i = 0; i < expectedData; i++) {
-        input[i] = new_input[i];
-    }
+    // No initialization needed for now
 }
 
 // ReLU activation function
@@ -52,65 +42,61 @@ float DenseLayer::dotProduct(const float a[], const float b[], int size) {
 }
 
 // Forward pass: Matrix-vector multiplication + bias + ReLU
-void DenseLayer::forward(float d_in[16], const float* weights1D, const float bias[biasRows], int expected_inputs, float d_out[512]) { //Write output in a 1d array
-    if (expected_inputs != weightRows || expected_outputs != biasRows) {
-        std::cerr << "Error: Weights or bias dimensions are incorrect." << std::endl;
-        return;
-    }
-
+void DenseLayer::forward(float d_in[EXPECTED_DATA], float* weights1D, float bias[BIAS_ROWS], float d_out[NEURON_NUM]) {
     // Unwrap the 1D weights array into a 2D array
-    float weights[weightRows][weightCols];
-    for (int i = 0; i < weightRows; i++) {
-        for (int j = 0; j < weightCols; j++) {
-            weights[i][j] = weights1D[i * weightCols + j];
+    float weights[WEIGHT_ROWS][WEIGHT_COLS];
+    for (int i = 0; i < WEIGHT_ROWS; i++) {
+        for (int j = 0; j < WEIGHT_COLS; j++) {
+            weights[i][j] = weights1D[i * WEIGHT_COLS + j];
         }
     }
 
-    for (int i = 0; i < neurons; i++) {
+    for (int i = 0; i < NEURON_NUM; i++) {
         // Extract the i-th column of the weights matrix
-        float weightsColumn[weightRows];
-        for (int j = 0; j < weightRows; j++) {
+        float weightsColumn[WEIGHT_ROWS];
+        for (int j = 0; j < WEIGHT_ROWS; j++) {
             weightsColumn[j] = weights[j][i];
         }
 
         // Compute dot product of input and weights column
-        float sum = dotProduct(d_in, weightsColumn, weightRows);
+        float sum = dotProduct(d_in, weightsColumn, WEIGHT_ROWS);
         d_out[i] = ReLU(sum + bias[i]);
+        // std::cout << std::fixed << std::setprecision(8) << d_out[i] << std::endl;
     }
 }
 
 // Print the output values
-void DenseLayer::printOutput() {
-    for (int i = 0; i < neurons; i++) {
-        std::cout << output[i] << std::endl;
+void DenseLayer::printOutput(const float d_out[NEURON_NUM]) {
+    for (int i = 0; i < NEURON_NUM; i++) {
+        std::cout << d_out[i] << std::endl;
     }
 }
-
 int main() {
     // Load weights and bias
     std::string weightsFile = "/Users/kateaizpuru/Documents/CNN/test-data/weights.csv"; // Replace with your weights file name
-    float* weights1D = loadFunction(weightsFile, weightRows, weightCols, false);
+    float* weights1D = loadFunction(weightsFile, WEIGHT_ROWS, WEIGHT_COLS, false);
 
     std::string biasFile = "/Users/kateaizpuru/Documents/CNN/test-data/biases.csv"; // Replace with your bias file name
-    float* bias1D = loadFunction(biasFile, biasRows, biasCols, true);
+    float* bias1D = loadFunction(biasFile, BIAS_ROWS, BIAS_COLS, true);
 
     // Create a DenseLayer object
     DenseLayer denseLayer;
 
     // Set input values
-    float example_input[expectedData] = {
+    float example_input[EXPECTED_DATA] = {
         0.023172325, 0.954666768, 0.537868863, 0.428133923, 0.874992976, 0.52329852,
         0.499172047, 0.6028312, 0.095627101, 0.38898065, 0.799446854, 0.618940573,
         0.078196824, 0.882892741, 0.844261063, 0.523200747
     };
-    denseLayer.setInput(example_input);
 
     // Perform forward pass
-    float d_out[neurons];
-    denseLayer.forward(example_input, weights1D, bias1D, weightRows, biasRows, d_out);
+    float d_out[NEURON_NUM]; // Creates an empty array to store the output
+    denseLayer.forward(example_input, weights1D, bias1D, d_out);
 
     // Print the output values
-    denseLayer.printOutput();
+    denseLayer.printOutput(d_out);
+
+    
 
     // Free the 1D arrays
     freeData(weights1D);
