@@ -33,9 +33,15 @@ void forward(float d_in[W_EXP_RNUM], float weights1D[W_EXP_RNUM * W_B_CNUM], flo
         for(int j=0; j < W_EXP_RNUM; j++){
             wTmp[j] = weights1D[i * W_EXP_RNUM+j];
         }
+
+        //TODO: do the same trick for bias.
+        
         // Compute dot product of input and i-th column of weights
         float sum = dotProduct<W_EXP_RNUM>(dIn_tmp, wTmp);
         d_out[i] = ReLU(sum + bias[i]);
+    
+        // TODO: Load data from temp variable to d_out
+        
     }
 }
 // w0 w1 w2 w3 w4
