@@ -42,16 +42,16 @@ float dotProduct(const float a[SIZE], const float b[SIZE]) {
 // }
 
 // Gives similar results to the above function
-// template <size_t W_ROWS, size_t W_COLS>
-// void forward(float d_in[W_ROWS], float weights[W_ROWS * W_COLS], float bias[W_COLS], float d_out[W_COLS]) {
-//     for (size_t out_neuron = 0; out_neuron < W_COLS; out_neuron++) {  // For each output neuron (0-15)
-//         float sum = 0.0f;
-//         for (size_t in_feat = 0; in_feat < W_ROWS; in_feat++) {  // For each input feature (0-512)
-//             sum += d_in[in_feat] * weights[in_feat * W_COLS + out_neuron];  // Compute dot product
-//         }
-//         d_out[out_neuron] = ReLU(sum + bias[out_neuron]);  // Apply ReLU activation
-//     }
-// }
+template <size_t W_ROWS, size_t W_COLS>
+void forward(float d_in[W_ROWS], float weights[W_ROWS * W_COLS], float bias[W_COLS], float d_out[W_COLS]) {
+    for (size_t out_neuron = 0; out_neuron < W_COLS; out_neuron++) {  // For each output neuron (0-15)
+        float sum = 0.0f;
+        for (size_t in_feat = 0; in_feat < W_ROWS; in_feat++) {  // For each input feature (0-512)
+            sum += d_in[in_feat] * weights[in_feat * W_COLS + out_neuron];  // Compute dot product
+        }
+        d_out[out_neuron] = ReLU(sum + bias[out_neuron]);  // Apply ReLU activation
+    }
+}
 
 // template <size_t W_ROWS, size_t W_COLS>
 // void forward(float d_in[W_ROWS], float weights[W_ROWS * W_COLS],  //takes in a 1d array of weights (15x512]
@@ -61,17 +61,32 @@ float dotProduct(const float a[SIZE], const float b[SIZE]) {
 //         for (size_t in_feat = 0; in_feat < W_ROWS; in_feat++) {
 //             weightsColumn[in_feat] = weights[in_feat * W_COLS + out_neuron];
 //         }
+//     }
+// }
 
-template <size_t W_ROWS, size_t W_COLS>
-void forward(float d_in[W_ROWS], float weights[W_ROWS * W_COLS], float bias[W_COLS], float d_out[W_COLS]) {
-    for (size_t out_neuron = 0; out_neuron < W_COLS; out_neuron++) {
-        float sum = 0.0f;
-        for (size_t in_feat = 0; in_feat < W_ROWS; in_feat++) {
-            sum += d_in[in_feat] * weights[in_feat * W_COLS + out_neuron];
-        }
-        d_out[out_neuron] = ReLU(sum + bias[out_neuron]);
-    }
-}
+// template <size_t INPUTS, size_t OUTPUTS>
+// void forward(const float (&d_in)[INPUTS], const float (&weights)[INPUTS * OUTPUTS], const float (&bias)[OUTPUTS], float (&d_out)[OUTPUTS]) {
+//     for (size_t out_neuron = 0; out_neuron < OUTPUTS; ++out_neuron) {
+//         float sum = 0.0f;
+        
+//         // Loop through all input features (16 in your case)
+//         for (size_t in_feat = 0; in_feat < INPUTS; ++in_feat) {
+//             // Correct access: weights are stored in a row-major order, so for the current output neuron
+//             // we access the weight for each input feature in the same column for the current output neuron.
+//             sum += d_in[in_feat] * weights[in_feat + out_neuron * INPUTS]; // Access weights for current input and output neuron
+            
+//             // Debugging output to check the computation
+//             std::cout << "weights[" << in_feat << "][" << out_neuron << "] = " 
+//                       << weights[in_feat + out_neuron * INPUTS] << std::endl;
+//             std::cout << "d_in[" << in_feat << "] = " << d_in[in_feat] << std::endl;
+//             std::cout << "sum = " << sum << std::endl;
+//         }
+        
+//         // Apply bias and ReLU activation function
+//         d_out[out_neuron] = ReLU(sum + bias[out_neuron]);
+//     }
+// }
+
 
 // w0 w1 w2 w3 w4
 // w0 w16 w32 w48 w64 

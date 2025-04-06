@@ -21,23 +21,31 @@ int main() {
         // Load weights and biases from CSV files
 
         float weights[W_EXP_RNUM * W_B_CNUM];
-        float weights2D[W_EXP_RNUM][W_B_CNUM];
         loadFunction(weightsFile, W_EXP_RNUM, W_B_CNUM, weights,false);
         
+
+        // float* weights = loadFunction(weightsFile, W_EXP_RNUM, W_B_CNUM, false);
+
+
         float bias[B_ROWS];
         loadFunction(biasFile, B_ROWS, B_COL, bias, true);
-
+    
+        // float* bias = loadFunction(biasFile, B_ROWS, B_COL, true);
+        
         // Input array
         float d_in[W_EXP_RNUM] = {
-            0.7905826, 0.95574766, 0.17418092, 0.23858057, 0.03401104, 0.03165761, 0.14767082, 0.46765873, 0.06522544, 0.0605169, 
-            0.57054, 0.30463323, 0.5606492, 0.4245618, 0.17499015, 0.6956044
-        };
+            0.023172325, 0.954666768, 0.537868863, 0.428133923, 0.874992976, 0.52329852,
+        0.499172047, 0.6028312, 0.095627101, 0.38898065, 0.799446854, 0.618940573,
+        0.078196824, 0.882892741, 0.844261063, 0.523200747
+    };
+
 
         // Output array
         float d_out[W_B_CNUM];
 
         // Perform forward pass
-        forward<W_EXP_RNUM, W_B_CNUM>(d_in, weights, bias, d_out);
+        forward<16, 512>(d_in, weights, bias, d_out);
+        // forward<W_EXP_RNUM, W_B_CNUM>(d_in, weights, bias, d_out);
 
         // Print output
         printOutput<W_B_CNUM>(d_out);
