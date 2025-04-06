@@ -9,7 +9,6 @@ inline float ReLU(float x) {
     return (x > 0) ? x : 0;
 }
 
-// Compute dot product of two arrays
 template <size_t SIZE>
 float dotProduct(const float a[SIZE], const float b[SIZE]) {
     float result = 0.0f;
@@ -19,37 +18,67 @@ float dotProduct(const float a[SIZE], const float b[SIZE]) {
     return result;
 }
 
+// Most recent version of the forward function
 // Forward pass: Matrix-vector multiplication + bias + ReLU
-template <size_t W_EXP_RNUM, size_t W_B_CNUM>
-void forward(float d_in[W_EXP_RNUM], float weights1D[W_EXP_RNUM * W_B_CNUM], float bias[W_B_CNUM], float d_out[W_B_CNUM]) {
-    // load data
-    float dIn_tmp[W_EXP_RNUM];
-    float wTmp[W_B_CNUM];
-    for(int i=0; i < W_EXP_RNUM; i++){
-        dIn_tmp[i] = d_in[i];
-    }
+// template <size_t W_ROWS, size_t W_COLS>
+// void forward(float d_in[W_ROWS], float weights1D[W_ROWS * W_COLS], float bias[W_COLS], float d_out[W_COLS]) {
+//     // load data
+//     float dIn_tmp[W_ROWS];
+//     float wTmp[W_COLS];
+//     for(int i=0; i < W_ROWS; i++){
+//         dIn_tmp[i] = d_in[i];
+//     }
 
-    for (size_t i = 0; i < W_B_CNUM; i++) {
-        for(int j=0; j < W_EXP_RNUM; j++){
-            wTmp[j] = weights1D[i * W_EXP_RNUM+j];
-        }
-
-        //TODO: do the same trick for bias.
-        
-        // Compute dot product of input and i-th column of weights
-        float sum = dotProduct<W_EXP_RNUM>(dIn_tmp, wTmp);
-        d_out[i] = ReLU(sum + bias[i]);
+//     for (size_t i = 0; i < W_COLS; i++) {
+//         for(int j=0; j < W_ROWS; j++){
+//             wTmp[j] = weights1D[i * W_ROWS+j];
+//         }
+//         float sum = dotProduct<W_ROWS>(dIn_tmp, wTmp);
+//         d_out[i] = ReLU(sum + bias[i]);
     
-        // TODO: Load data from temp variable to d_out
-        
+//         // TODO: Load data from temp variable to d_out
+       
+//     }
+// }
+
+// Gives similar results to the above function
+// template <size_t W_ROWS, size_t W_COLS>
+// void forward(float d_in[W_ROWS], float weights[W_ROWS * W_COLS], float bias[W_COLS], float d_out[W_COLS]) {
+//     for (size_t out_neuron = 0; out_neuron < W_COLS; out_neuron++) {  // For each output neuron (0-15)
+//         float sum = 0.0f;
+//         for (size_t in_feat = 0; in_feat < W_ROWS; in_feat++) {  // For each input feature (0-512)
+//             sum += d_in[in_feat] * weights[in_feat * W_COLS + out_neuron];  // Compute dot product
+//         }
+//         d_out[out_neuron] = ReLU(sum + bias[out_neuron]);  // Apply ReLU activation
+//     }
+// }
+
+// template <size_t W_ROWS, size_t W_COLS>
+// void forward(float d_in[W_ROWS], float weights[W_ROWS * W_COLS],  //takes in a 1d array of weights (15x512]
+//              float bias[W_COLS], float d_out[W_COLS]) {
+//     for (size_t out_neuron = 0; out_neuron < W_COLS; out_neuron++) {  // For each output neuron ()
+//         float weightsColumn[W_ROWS];
+//         for (size_t in_feat = 0; in_feat < W_ROWS; in_feat++) {
+//             weightsColumn[in_feat] = weights[in_feat * W_COLS + out_neuron];
+//         }
+
+template <size_t W_ROWS, size_t W_COLS>
+void forward(float d_in[W_ROWS], float weights[W_ROWS * W_COLS], float bias[W_COLS], float d_out[W_COLS]) {
+    for (size_t out_neuron = 0; out_neuron < W_COLS; out_neuron++) {
+        float sum = 0.0f;
+        for (size_t in_feat = 0; in_feat < W_ROWS; in_feat++) {
+            sum += d_in[in_feat] * weights[in_feat * W_COLS + out_neuron];
+        }
+        d_out[out_neuron] = ReLU(sum + bias[out_neuron]);
     }
 }
+
 // w0 w1 w2 w3 w4
 // w0 w16 w32 w48 w64 
 // Print the output values
-template <size_t W_B_CNUM>
-void printOutput(float d_out[W_B_CNUM]) {
-    for (size_t i = 0; i < W_B_CNUM; i++) {
+template <size_t W_COLS>
+void printOutput(float d_out[W_COLS]) {
+    for (size_t i = 0; i < W_COLS; i++) {
         std::cout << "d_out[" << i << "] = " << d_out[i] << std::endl;
     }
 }

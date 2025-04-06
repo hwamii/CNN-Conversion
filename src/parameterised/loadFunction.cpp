@@ -5,10 +5,7 @@
 
 // Define loadData function
 void loadFunction(const std::string &filename, int csvRows, int csvCols, float * data, bool isBias) {
-    // Dynamically allocate memory for the 1D array
-
-    // float data = new float[csvRows * csvCols];
-
+    
     std::ifstream file(filename); // Read the file
     if (!file.is_open()) { // Check if the file is open
         std::cerr << "Error: Could not open file: " << filename << std::endl;
@@ -26,9 +23,7 @@ void loadFunction(const std::string &filename, int csvRows, int csvCols, float *
             // For bias files, each line contains a single value
             try {
                 std::stringstream ss(line);
-                // std::cout << "Reading line: '" << line << "'" << std::endl;  // Debug print
                 ss >> data[i]; // Directly convert the line to a float
-                // std::cout << "Data[" << i << "][0] = " << data[i] << std::endl; // Debug print
             } catch (const std::invalid_argument &e) {
                 std::cerr << "Error: Invalid number at row " << i << std::endl;
                 exit(1);
@@ -41,7 +36,7 @@ void loadFunction(const std::string &filename, int csvRows, int csvCols, float *
             while (std::getline(ss, value, ',')) { // Loop through the values in the line with a comma delimiter
                 try {
                     data[i * csvCols + j] = std::stof(value); // Flatten the 2D array into 1D
-                    std::cout << "Data[" << i << "][" << j << "] = " << data[i * csvCols + j] << std::endl; // Debug print
+                    // std::cout << "Data[" << i << "][" << j << "] = " << data[i * csvCols + j] << std::endl; // Debug print
                 } catch (const std::invalid_argument &e) {
                     std::cerr << "Error: Invalid number at row " << i << ", column " << j << std::endl;
                     exit(1);
@@ -59,6 +54,8 @@ void loadFunction(const std::string &filename, int csvRows, int csvCols, float *
     }
     file.close(); 
 }
+
+
 
 // Define freeData function
 void freeData(float* data) {
