@@ -1,0 +1,94 @@
+#include "loadFunction.h"
+#include "denseLayer.hpp"
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <cstddef>
+// Define constants for array sizes
+
+// Dense0
+constexpr std::size_t D_INPUT = 16;   // Number of rows in weights matrix (input size)
+constexpr std::size_t D_OUTPUT = 512; // Number of columns in weights matrix (output size)
+
+constexpr std::size_t D_WROWS = 16;
+constexpr std::size_t D_BWCOLS = 512;
+// Dense1
+constexpr std::size_t D1_INPUT = 512;  // Number of rows in weights matrix (input size)
+constexpr std::size_t D1_OUTPUT = 256; // Number of columns in weights matrix (output size)
+
+constexpr std::size_t D1_WROWS = 512;
+constexpr std::size_t D1_BWCOLS = 256;
+
+int main()
+{
+
+    // // File paths
+    // std::string dense0Weights = "/Users/kateaizpuru/Documents/CNN/test-data/weights.csv"; // Replace with your weights file path
+    // std::string dense0Bias = "/Users/kateaizpuru/Documents/CNN/test-data/biases.csv";     // Replace with your bias file path
+
+    // // Dense0
+    // float d0Weights[D_INPUT * D_OUTPUT];
+    // loadFunction(dense0Weights, D_INPUT, D_OUTPUT, d0Weights, false);
+
+    // float d0Bias[D_BWCOLS];
+    // loadFunction(dense0Bias, D_BWCOLS, D_BWCOLS, d0Bias, true);
+    // // Input array
+    // float d0Input[D_INPUT] = {
+    //     0.023172325, 0.954666768, 0.537868863, 0.428133923, 0.874992976, 0.52329852,
+    //     0.499172047, 0.6028312, 0.095627101, 0.38898065, 0.799446854, 0.618940573,
+    //     0.078196824, 0.882892741, 0.844261063, 0.523200747
+    // };
+
+
+    // File paths
+    std::string dense1Weights = "/Users/kateaizpuru/Documents/CNN/test-data/dense1/dense5_weights1.csv"; // Replace with your weights file path
+    std::string dense1Bias = "/Users/kateaizpuru/Documents/CNN/test-data/dense1/dense5_biases1.csv";     // Replace with your bias file path
+    std::string dense1Input = "/Users/kateaizpuru/Documents/CNN/test-data/dense1/dense1Input.csv"; // Replace with your input file path
+    // Dense0
+    float d1Weights[D_INPUT * D_OUTPUT]; //512 * 256
+    loadFunction(dense1Weights, D_INPUT, D_OUTPUT, d1Weights, false);
+
+    float d1Bias[D_BWCOLS]; // 256
+    loadFunction(dense1Bias, D_BWCOLS, D_BWCOLS, d1Bias, true);
+    // Input array
+    // float d1Input[D_INPUT] = {
+    //     0.790583,
+    //     0.955748,
+    //     0.174181,
+    //     0.238581,
+    //     0.034011,
+    //     0.031658,
+    //     0.147671,
+    //     0.467659,
+    //     0.065225,
+    //     0.060517,
+    //     0.57054,
+    //     0.304633,
+    //     0.560649,
+    //     0.424562,
+    //     0.17499,
+    //     0.695604
+    // };
+
+
+    // Read dense1 input from csv file
+    float d1Input[D_INPUT];
+    loadFunction(dense1Input, D_INPUT, D_OUTPUT, d1Input, false);
+
+    // Output array
+    // float d0Output[D_OUTPUT];
+    float d1Output[D1_OUTPUT];
+
+    //Forward
+    // forward<D_INPUT, D_OUTPUT>(d0Input, d0Weights, d0Bias, d0Output);
+    forward<D1_INPUT, D1_OUTPUT>(d1Input, d1Weights, d1Bias, d1Output);
+
+    // Print output
+    // printOutput<D_OUTPUT>(d0Output);
+    printOutput<D1_OUTPUT>(d1Output);
+
+    // Dense1
+
+
+    return 0;
+}

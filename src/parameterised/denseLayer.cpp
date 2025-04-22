@@ -17,10 +17,11 @@ constexpr size_t NEURON_NUM = 512;
 
 // Compute dot product of two arrays
 
-float dotProduct(const float a[], const float b[], size_t size) {
-    float result;
-    for (size_t i = 0; i < size; i++) {
-        result += a[i] * b[i];
-    }
-    return result;
-}
+//Remove dotproduct function from the cpp file 
+// float dotProduct(const float a[], const float b[], size_t size) {
+//     float result;
+//     for (size_t i = 0; i < size; i++) {
+//         result += a[i] * b[i];
+//     }
+//     return result;
+// }
