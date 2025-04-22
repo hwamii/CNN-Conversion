@@ -34,20 +34,6 @@ constexpr std::size_t D3_WROWS = 64;
 constexpr std::size_t D3_BWCOLS = 2;
 
 
-void saveToCSV(const std::string &filename, const float *data, std::size_t length) {
-    std::ofstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file for writing: " << filename << std::endl;
-        return;
-    }
-    for (std::size_t i = 0; i < length; i++) {
-        file << data[i];
-        if (i < length - 1) {
-            file << ",";
-        }
-    }
-    file.close();
-}
 
 int main()
 {
