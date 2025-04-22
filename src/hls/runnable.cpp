@@ -1,5 +1,5 @@
 #include <iostream>
-#include "loadFunction.h"
+#include "loadFunction.hpp"
 #include "denseLayer.hpp"
 #include "cnn_top.hpp"
 #include "paths.hpp"

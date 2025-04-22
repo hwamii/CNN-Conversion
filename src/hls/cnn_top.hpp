@@ -44,7 +44,7 @@
 #pragma once
 
 #include "denseLayer.hpp"  // that contains the dense layer implementation with the alternative activation functions
-
+#include "loadFunction.hpp"  // that contains the loadFunction and saveToCSV functions
 template <
     std::size_t D0_IN,
     std::size_t D0_OUT,
@@ -52,7 +52,7 @@ template <
     std::size_t D2_OUT,
     std::size_t D3_OUT
 >
-void neural_net_top(
+void cnn_top(
     float input[D0_IN],
 
     float weights0[D0_IN * D0_OUT],
