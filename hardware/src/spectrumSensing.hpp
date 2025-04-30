@@ -38,3 +38,4 @@ void spectrumSensing(
     dense<D1_OUT, D2_OUT, RELU>(out1, weights2, bias2, out2);
     dense<D2_OUT, D3_OUT, SOFTMAX>(out2, weights3, bias3, output);  // final
 }
+
