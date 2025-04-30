@@ -9,14 +9,11 @@ enum ActivationType { NONE, RELU, SOFTMAX };
 
 template <size_t IN, size_t OUT, ActivationType ACT = RELU>
 void dense(float input[IN], float weights[IN * OUT], float bias[OUT], float output[OUT]) {
-#pragma HLS INLINE
     float temp[OUT];
 
     for (size_t i = 0; i < OUT; i++) {
-#pragma HLS PIPELINE
         float sum = 0.0f;
         for (size_t j = 0; j < IN; j++) {
-#pragma HLS UNROLL factor=4
             sum += input[j] * weights[j * OUT + i];
         }
         temp[i] = sum + bias[i];
@@ -24,7 +21,6 @@ void dense(float input[IN], float weights[IN * OUT], float bias[OUT], float outp
 
     if constexpr (ACT == RELU) {
         for (size_t i = 0; i < OUT; i++) {
-#pragma HLS UNROLL
             output[i] = std::max(0.0f, temp[i]);
         }
     } else if constexpr (ACT == SOFTMAX) {
@@ -44,7 +40,6 @@ void dense(float input[IN], float weights[IN * OUT], float bias[OUT], float outp
         }
     } else {
         for (size_t i = 0; i < OUT; i++) {
-#pragma HLS UNROLL
             output[i] = temp[i];
         }
     }
