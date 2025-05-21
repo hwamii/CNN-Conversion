@@ -1,5 +1,5 @@
 #include "spectrumSensing.hpp"
-
+extern "C"{
 void spectrumSensing_top(
     float input[16],
     float weights0[16 * 512],
@@ -13,10 +13,7 @@ void spectrumSensing_top(
     float output[2]
 ) {
 
-
-
-#pragma PIPELINE off
-    spectrumSensing<16, 512, 256, 64, 2>(
+    spectrumSensing<float, 16, 512, 256, 64, 2>(
         input,
         weights0, bias0,
         weights1, bias1,
@@ -24,4 +21,5 @@ void spectrumSensing_top(
         weights3, bias3,
         output
     );
+}
 }

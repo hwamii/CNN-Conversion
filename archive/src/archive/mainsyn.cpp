@@ -1,6 +1,7 @@
-#include "cnn_top.hpp"
+// #include "cnn_top.hpp"
 #include "loadFunction.hpp"
 #include "paths.hpp"
+#include "spectrumSensing.hpp"
 
 constexpr std::size_t D0_IN = 16;
 constexpr std::size_t D0_OUT = 512;
@@ -33,9 +34,7 @@ int main() {
     loadFunction(paths.dense3.bias, 1, D3_OUT, bias3, true);
 
     // Call the HLS-synthesizable kernel
-    cnn_top<
-        D0_IN, D0_OUT, D1_OUT, D2_OUT, D3_OUT
-    >(input, weights0, bias0, weights1, bias1, weights2, bias2, weights3, bias3, output);
+    spectrumSaving<16, 512, 256, 64, 2>(input, weights0, bias0, weights1, bias1, weights2, bias2, weights3, bias3, output);
 
     // Output results
     std::cout << "HLS Output (Softmax):" << std::endl;

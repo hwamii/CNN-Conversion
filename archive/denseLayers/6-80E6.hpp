@@ -7,12 +7,21 @@
 
 enum ActivationType { NONE, RELU, SOFTMAX };
 
-template <size_t IN, size_t OUT, ActivationType ACT = RELU>
-void dense(float input[IN], float weights[IN * OUT], float bias[OUT], float output[OUT]) {
-    float temp[OUT];
+template <typename T,
+        size_t IN,
+        size_t OUT,
+        ActivationType ACT = RELU
+        >
+
+void dense(const T input[IN], const T weights[IN * OUT], const T bias[OUT], T output[OUT]) {
+	#pragma HLS ARRAY_PARTITION variable=input complete dim=1
+	#pragma HLS ARRAY_PARTITION variable=output complete dim=1
+
+    T temp[OUT];
 
     for (size_t i = 0; i < OUT; i++) {
-        float sum = 0.0f;
+	#pragma HLS PIPELINE II=1
+        T sum = (T)0;
         for (size_t j = 0; j < IN; j++) {
             sum += input[j] * weights[j * OUT + i];
         }
@@ -21,22 +30,24 @@ void dense(float input[IN], float weights[IN * OUT], float bias[OUT], float outp
 
     if constexpr (ACT == RELU) {
         for (size_t i = 0; i < OUT; i++) {
-            output[i] = std::max(0.0f, temp[i]);
+            output[i] = (temp[i] > (T)0) ? temp[i] : (T)0;
         }
     } else if constexpr (ACT == SOFTMAX) {
-        float maxVal = temp[0];
+        T maxVal = temp[0];
         for (size_t i = 1; i < OUT; i++) {
             if (temp[i] > maxVal) maxVal = temp[i];
         }
 
-        float sum = 0.0f;
+        T sumExp= (T)0;
         for (size_t i = 0; i < OUT; i++) {
-            output[i] = std::exp(temp[i] - maxVal);
-            sum += output[i];
+            output[i] = (sizeof(T)==4
+                ? expf(temp[i] - maxVal)
+                : exp(temp[i] - maxVal));
+            sumExp += output[i];
         }
 
         for (size_t i = 0; i < OUT; i++) {
-            output[i] /= sum;
+            output[i] /= sumExp;
         }
     } else {
         for (size_t i = 0; i < OUT; i++) {

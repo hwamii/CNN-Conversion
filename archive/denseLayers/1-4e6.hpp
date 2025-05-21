@@ -1,0 +1,62 @@
+#pragma once
+
+#include <iostream>
+#include <iomanip>
+#include <cstddef> // For size_t
+#include <cmath>
+
+enum ActivationType { NONE, RELU, SOFTMAX };
+
+template <typename T,
+        size_t IN,
+        size_t OUT,
+        ActivationType ACT = RELU
+        >
+
+void dense(const T input[IN], const T weights[IN * OUT], const T bias[OUT], T output[OUT]) {
+	T products[IN][OUT];
+	T temp[OUT];
+	//Compute input[j] * weights[j][i] and store
+	for (size_t j = 0; j < IN; j++) {
+	   for (size_t i = 0; i < OUT; i++) {
+#pragma HLS UNROLL factor=8
+	        products[j][i] = input[j] * weights[j * OUT + i];
+	   }
+	}
+	// Sum across j for each output neuron
+	for (size_t i = 0; i < OUT; i++) {
+#pragma HLS PIPELINE
+	   T sum = 0;
+	   for (size_t j = 0; j < IN; j++) {
+#pragma HLS UNROLL factor=8
+	     sum += products[j][i];
+	   }
+	   temp[i] = sum + bias[i];
+	}
+    if constexpr (ACT == RELU) {
+        for (size_t i = 0; i < OUT; i++) {
+            output[i] = (temp[i] > (T)0) ? temp[i] : (T)0;
+        }
+    } else if constexpr (ACT == SOFTMAX) {
+        T maxVal = temp[0];
+        for (size_t i = 1; i < OUT; i++) {
+            if (temp[i] > maxVal) maxVal = temp[i];
+        }
+
+        T sumExp= (T)0;
+        for (size_t i = 0; i < OUT; i++) {
+            output[i] = (sizeof(T)==4
+                ? expf(temp[i] - maxVal)
+                : exp(temp[i] - maxVal));
+            sumExp += output[i];
+        }
+
+        for (size_t i = 0; i < OUT; i++) {
+            output[i] /= sumExp;
+        }
+    } else {
+        for (size_t i = 0; i < OUT; i++) {
+            output[i] = temp[i];
+        }
+    }
+}
